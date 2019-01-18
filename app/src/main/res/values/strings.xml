@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MoneyStuff</string>
+    <string name="add">ADD</string>
+    <string-array name="items_array">
+        <item> </item>
+        <item>Groceries</item>
+        <item>Fast Food</item>
+        <item>Gas</item>
+        <item>School</item>
+        <item>Tech/Games/Books</item>
+        <item>Other</item>
+    </string-array>
+</resources>
