@@ -14,8 +14,6 @@ import java.util.*
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(){
-    //if spinner items dont show up, put interface back.
-    //check button method to see how to use lambda if button doesnt work
 
     init {
         BudgetListManager.getInstance()
@@ -41,7 +39,7 @@ class MainActivity : AppCompatActivity(){
     private fun initializeWidgets() {
         spinner = findViewById(R.id.spinner)
         addButton = findViewById(R.id.add_button)
-        addButton.setOnClickListener( View.OnClickListener { addToBudget() })
+        addButton.setOnClickListener  { addToBudget() }
         spendingInput = findViewById(R.id.spending_et)
 
         recyclerView = findViewById(R.id.spending_rv)
@@ -73,12 +71,17 @@ class MainActivity : AppCompatActivity(){
 
     private fun addToBudget() {
 
-        val number = spendingInput.text.toString().toInt()
-        val location = spinner.selectedItem.toString()
-        BudgetListManager.addToList(location, number)
-        Log.d(TAG, "Location: $location, Number: $number")
-
-        //undoCurrentInput()
+        if (spendingInput.text.isEmpty()){
+            Toast.makeText(this, "Enter Money Spent, Bitch", Toast.LENGTH_LONG).show()
+            return
+        }else{
+            val number = spendingInput.text.toString().toInt()
+            val location = spinner.selectedItem.toString()
+            BudgetListManager.addToList(location, number)
+            Log.d(TAG, "Location: $location, Number: $number")
+            recyclerView.adapter?.notifyDataSetChanged()
+            undoCurrentInput()
+        }
 
     }
 
@@ -87,15 +90,8 @@ class MainActivity : AppCompatActivity(){
         val view = findViewById<View>(R.id.main_activity)
 
         Snackbar.make(view, mistakeText, Snackbar.LENGTH_LONG)
-            .setAction("Undo", View.OnClickListener { BudgetListManager.removeNewItem() })
+            .setAction("Undo",  { BudgetListManager.removeNewItem() }).show()
 
-        if (spendingInput.text.isEmpty()){
-            addButton.isEnabled = false
-            if (addButton.isPressed) {
-                Toast.makeText(this, "Enter Money Spent, Bitch", Toast.LENGTH_LONG).show()
-                Log.d(TAG, "the edit text shows: $spendingInput,  is empty")
-            }
-        }
     }
 
 

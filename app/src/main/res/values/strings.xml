@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoneyStuff</string>
+    <string name="app_name">Where did Ur Money Go?</string>
     <string name="add">ADD</string>
     <string-array name="items_array">
         <item> </item>
