@@ -1,5 +1,7 @@
 package freeflow.moneystuff
 
+import android.app.Application
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,12 +10,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 private const val TAG = "BudgetRecyclerView"
-class BudgetRecyclerView : RecyclerView.Adapter<BudgetRecyclerView.BudgetViewHolder>() {
+class BudgetRecyclerView(val context: Context) : RecyclerView.Adapter<BudgetRecyclerView.BudgetViewHolder>() {
 
 
-    val a = BudgetListManager.getInstance()
 
-
+    private val expenseDBList = ExpensesRepository(context).findAll()
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): BudgetViewHolder {
         val viewHolder = LayoutInflater.from(p0.context)
@@ -23,15 +24,16 @@ class BudgetRecyclerView : RecyclerView.Adapter<BudgetRecyclerView.BudgetViewHol
     }
 
     override fun getItemCount(): Int {
-        return a.size
+        return expenseDBList.size
     }
 
     override fun onBindViewHolder(p0: BudgetViewHolder, p1: Int) {
         //location text shows spinner options
         //spending shows number
+        //val values = expenseDBList[p1]
+        p0.locationPosition.text = expenseDBList[p1].location
+        p0.spendingPosition.text = expenseDBList[p1].spendingAmount.toString()
 
-        p0.spendingPosition.text = a[p1].component2().toString()
-        p0.locationPosition.text = a[p1].component1()
         Log.d(TAG, "onBindViewHolder: ${p0.spendingPosition} , ${p0.locationPosition}" )
 
 

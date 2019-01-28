@@ -14,6 +14,8 @@ object BudgetListManager {
 
         return spendingList
     }
+/*
+
 
     fun addToList(location: String, spending: Int) {
         val budgetExpense = BudgetExpense(location, spending)
@@ -25,5 +27,5 @@ object BudgetListManager {
         spendingList.removeAt(lastIndex)
         Log.d(TAG, "removed position at: $lastIndex")
     }
-
+    */
 }

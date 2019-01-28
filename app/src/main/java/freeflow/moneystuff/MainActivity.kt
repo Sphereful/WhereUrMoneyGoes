@@ -15,18 +15,16 @@ private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(){
 
-    init {
-        BudgetListManager.getInstance()
-        Log.d(TAG, "Budget Manager initialized")
-    }
 
-    private val mistakeText = "Delete Mistake?"
+    //private val mistakeText = "Delete Mistake?"
 
 
     private lateinit var spinner: Spinner
     private lateinit var addButton: Button
     private lateinit var spendingInput: EditText
     private lateinit var recyclerView: RecyclerView
+
+    private val expenseDB = ExpensesRepository(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +35,10 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun initializeWidgets() {
-        spinner = findViewById(R.id.spinner)
+        spinner = findViewById<Spinner>(R.id.spinner)
         addButton = findViewById(R.id.add_button)
         addButton.setOnClickListener  { addToBudget() }
         spendingInput = findViewById(R.id.spending_et)
-
         recyclerView = findViewById(R.id.spending_rv)
 
     }
@@ -63,7 +60,7 @@ class MainActivity : AppCompatActivity(){
     private fun initializeRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this,
             LinearLayoutManager.VERTICAL, true)
-        recyclerView.adapter = BudgetRecyclerView()
+        recyclerView.adapter = BudgetRecyclerView(this)
         recyclerView.hasFixedSize()
 
     }
@@ -77,23 +74,25 @@ class MainActivity : AppCompatActivity(){
         }else{
             val number = spendingInput.text.toString().toInt()
             val location = spinner.selectedItem.toString()
-            BudgetListManager.addToList(location, number)
+            val expenses = BudgetExpense(0, location, number)
+            expenseDB.create(expenses)
             Log.d(TAG, "Location: $location, Number: $number")
             recyclerView.adapter?.notifyDataSetChanged()
-            undoCurrentInput()
         }
 
     }
 
 
+    /*
     private fun undoCurrentInput(){
+     BudgetListManager.addToList(location, number)
         val view = findViewById<View>(R.id.main_activity)
 
         Snackbar.make(view, mistakeText, Snackbar.LENGTH_LONG)
             .setAction("Undo",  { BudgetListManager.removeNewItem() }).show()
 
     }
-
+    */
 
 
 
