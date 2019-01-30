@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -13,16 +14,14 @@ import java.util.*
 
 private const val TAG = "MainActivity"
 
-class MainActivity : AppCompatActivity(){
-
-
-    //private val mistakeText = "Delete Mistake?"
+class MainActivity : AppCompatActivity() {
 
 
     private lateinit var spinner: Spinner
     private lateinit var addButton: Button
     private lateinit var spendingInput: EditText
     private lateinit var recyclerView: RecyclerView
+    private lateinit var totalSpent: TextView
 
     private val expenseDB = ExpensesRepository(this)
 
@@ -32,14 +31,17 @@ class MainActivity : AppCompatActivity(){
         initializeWidgets()
         createSpinner()
         initializeRecyclerView()
+        totalSpent()
     }
 
     private fun initializeWidgets() {
         spinner = findViewById<Spinner>(R.id.spinner)
         addButton = findViewById(R.id.add_button)
-        addButton.setOnClickListener  { addToBudget() }
+        addButton.setOnClickListener { addToBudget() }
         spendingInput = findViewById(R.id.spending_et)
         recyclerView = findViewById(R.id.spending_rv)
+        totalSpent = findViewById(R.id.total_spent)
+
 
     }
 
@@ -58,42 +60,46 @@ class MainActivity : AppCompatActivity(){
     }
 
     private fun initializeRecyclerView() {
-        recyclerView.layoutManager = LinearLayoutManager(this,
-            LinearLayoutManager.VERTICAL, true)
+        recyclerView.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.VERTICAL, true
+        )
         recyclerView.adapter = BudgetRecyclerView(this)
         recyclerView.hasFixedSize()
-
+        deleteSwipe()
     }
 
+    private fun deleteSwipe() {
+        val swipeHandler = object : SwipeToDelete(this) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = recyclerView.adapter as BudgetRecyclerView
+                adapter.removeAt(viewHolder.adapterPosition)
+                totalSpent()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
 
     private fun addToBudget() {
-
-        if (spendingInput.text.isEmpty()){
+        if (spendingInput.text.isEmpty()) {
             Toast.makeText(this, "Enter Money Spent, Bitch", Toast.LENGTH_LONG).show()
             return
-        }else{
-            val number = spendingInput.text.toString().toInt()
-            val location = spinner.selectedItem.toString()
-            val expenses = BudgetExpense(0, location, number)
-            expenseDB.create(expenses)
-            Log.d(TAG, "Location: $location, Number: $number")
-            recyclerView.adapter?.notifyDataSetChanged()
+        } else {
+            formatListData()
         }
-
     }
-
-
-    /*
-    private fun undoCurrentInput(){
-     BudgetListManager.addToList(location, number)
-        val view = findViewById<View>(R.id.main_activity)
-
-        Snackbar.make(view, mistakeText, Snackbar.LENGTH_LONG)
-            .setAction("Undo",  { BudgetListManager.removeNewItem() }).show()
-
+    private fun formatListData(){
+        val number = spendingInput.text.toString().toInt()
+        val location = spinner.selectedItem.toString()
+        val expenses = BudgetExpense(0, location, number)
+        expenseDB.create(expenses)
+        recyclerView.adapter?.notifyDataSetChanged()
     }
-    */
-
+    private fun totalSpent() {
+        totalSpent.text = expenseDB.findAll().map { it.spendingAmount }.sum().toString()
+        //add all
+    }
 
 
 }
